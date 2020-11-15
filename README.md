@@ -2,7 +2,9 @@
 
 Getting near real-time notifications on Carousell.
 
-NOTE: Slack integration is disabled for the time being
+NOTE:
+- Slack integration is not working for the time being
+- Only works for malaysia, RM currency
 
 ## Requirements
 

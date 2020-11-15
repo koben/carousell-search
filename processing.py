@@ -4,8 +4,12 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, DateTime, Float, Boolean
 from sqlalchemy.orm import sessionmaker
-import chatbot as robot
-from configurations import RESULTS_COUNT
+#import chatbot as robot
+from myconfigurations import RESULTS_COUNT
+import re
+
+# product url is
+# https://www.carousell.com.my/p/$listingId
 
 Base = declarative_base()
 
@@ -29,25 +33,36 @@ def find_stuff(search_query):
     results = my_want.send_request()
 
     for r in results:
+        listingId = r['listingCard']['id']
+        timeCreated = r['listingCard']['aboveFold'][0]['timestampContent']['seconds']['low']
+        seller = r['listingCard']['seller']['username']
+        title = r['listingCard']['belowFold'][0]['stringContent']
+        price = r['listingCard']['belowFold'][1]['stringContent']
+        price_cur = 'RM'
+        price_str = re.sub(price_cur, '', price)
+        if "," in price_str:
+            price_str = re.sub(',', '', price_str)
+        price_float = float(price_str)
         #skip results without query in listing title
-        if want not in (r['title']).lower():
+        if search_query not in (title.lower()):
             continue
         #check if listing is in DB already
-        check = (session.query(CarousellListing).filter_by(listing_id=r['id']).
-                    first())
+        check = (session.query(CarousellListing).filter_by(listing_id=listingId).first())
         #if it is not in DB
         if check is None:
             listing = CarousellListing(
-                listing_id = r['id'],
-                seller = r['seller']['username'],
-                title = r['title'],
-                currency_symbol = r['currency_symbol'],
-                price = r['price'],
-                time = arrow.get(r['time_created']).format('DD/MM/YYYY HH:MM')
+                listing_id = listingId,
+                seller = seller,
+                title = title,
+                currency_symbol = price_cur,
+                price = price_float,
+                time = arrow.get(timeCreated).format('DD/MM/YYYY HH:MM')
             )
             session.add(listing)
             session.commit()
-            line_item = (r['seller']['username'], r['title'], r['price'],
-                        arrow.get(r['time_indexed']).format('DD/MM/YYYY HH:MM'))
-            robot.post_message(', '.join(line_item))
+            line_item = (seller, title, price_float,
+                        arrow.get(timeCreated).format('DD/MM/YYYY HH:MM'))
+            #robot.post_message(', '.join(line_item))
+        print(line_item)
+        print('https://www.carousell.com.my/p/%s' % listingId)
     return

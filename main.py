@@ -1,6 +1,6 @@
 import processing
 import time
-from configurations import ITEMS, FREQUENCY
+from myconfigurations import ITEMS, PAUSE_INTERVAL
 
 if __name__ == "__main__":
     while True:
@@ -10,4 +10,4 @@ if __name__ == "__main__":
         except KeyboardInterrupt:
             print ("Interrupt")
             sys.exit(1)
-        time.sleep(600)
+        time.sleep(PAUSE_INTERVAL)

@@ -19,6 +19,7 @@ Python 3+
 Configure `myconfigurations.py` with 
 - your Slack token from https://api.slack.com/tokens
 - your Slack channel
+- Pause Interval in `PAUSE_INTERVAL`
 - search queries in `ITEMS`
 
 Ensure that your Slack app has the correct permissions to post in channel

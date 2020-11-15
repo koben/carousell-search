@@ -2,6 +2,8 @@
 
 Getting near real-time notifications on Carousell.
 
+NOTE: Slack integration is disabled for the time being
+
 ## Requirements
 
 Python 3+

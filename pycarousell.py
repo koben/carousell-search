@@ -1,25 +1,31 @@
 import requests
 import json
 
+
+
 class CarousellSearch(object):
     def __init__(self, query_string=None, results=30):
-        self.base_url = ("https://carousell.com/ui/iso/api-main;path=/2.5/
-                            products/;query=")
+        self.base_url = ("https://www.carousell.com.my/api-service/filter/search/3.3/products/")
         self.fields = {
-            "count": results,
-            "sort": 'recent',
-            "query": query_string,
-            "lattitude": '',
-            "longitdue": '',
-            "lte": '',
-            "unit": '',
-            "country_id": '1880251',
-            "country_code": "SG"
+            "count":results,
+            "countryCode":"MY",
+            "countryId":"1733045",
+            "filters":[],
+            "isFreeItems": False,
+            "locale":"en",
+            "prefill": {
+                "prefill_sort_by":""
+            },
+            "query": query_string
         }
-        query_fields = json.dumps(self.fields)
-        self.query_url = self.base_url + query_fields
+        self.query_fields = json.dumps(self.fields)
 
     def send_request(self):
-        r = requests.get(self.query_url)
+        headers = {
+           "Content-Type": "application/json",
+        }
+        r = requests.post( url=self.base_url, data=self.query_fields , headers=headers)
         data = json.loads(r.text)
-        return data['products']
+        if 'results' in data['data']:
+            return data['data']['results']
+        return {}
